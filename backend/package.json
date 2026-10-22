@@ -35,12 +35,18 @@
   "jest": {
     "testEnvironment": "node",
     "globalSetup": "./__tests__/setup.js",
+    "moduleNameMapper": {
+      "^@exodus/bytes/encoding-lite\\.js$": "<rootDir>/__tests__/fixtures/exodusBytes/encoding.cjs",
+      "^@exodus/bytes/encoding\\.js$": "<rootDir>/__tests__/fixtures/exodusBytes/encoding.cjs",
+      "^@exodus/bytes/whatwg\\.js$": "<rootDir>/__tests__/fixtures/exodusBytes/whatwg.cjs",
+      "^@exodus/bytes/base64\\.js$": "<rootDir>/__tests__/fixtures/exodusBytes/base64.cjs"
+    },
+    "transform": {},
     "testPathIgnorePatterns": [
       "/node_modules/",
       "__tests__/setup.js",
       "__tests__/fixtures/"
     ],
-    "transform": {},
     "collectCoverage": false,
     "collectCoverageFrom": [
       "src/**/*.js"
@@ -104,6 +110,7 @@
     "pino-http": "^10.5.0",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
+    "validator": "^13.15.35",
     "ws": "^8.21.3"
   },
   "devDependencies": {

@@ -74,6 +74,43 @@ type AssetStatistics {
   assetsByType: [AssetTypeCount!]!
 }
 
+# ─── Reference stubs for entities owned by other subgraphs ───────────────
+# Asset.owner / Asset.transactions point at entities owned by the users and
+# transactions services. Per Federation v2 the fields listed in @provides
+# are declared @external here so this subgraph can serve them inline via
+# @provides without claiming ownership. Keys match the owning subgraphs
+# (User @key userId, Transaction @key transactionId).
+
+type User @key(fields: "userId") {
+  userId: ID!
+  walletAddress: String! @external
+}
+
+type Transaction @key(fields: "transactionId") {
+  transactionId: ID!
+  type: TransactionType! @external
+  status: TransactionStatus! @external
+}
+
+# Foreign enums mirrored from the transactions service so the provided
+# field types are identical to the owning subgraph.
+enum TransactionType {
+  PURCHASE
+  TRANSFER
+  MINT
+  BURN
+  APPROVAL
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
 type AssetTypeCount {
   assetType: AssetType!
   count: Int!

@@ -500,9 +500,11 @@ export function createRateLimitAdminRoutes(rateLimiterService, adminAuth, option
      *       500:
      *         description: Internal server error
      */
-    router.get('/geo/stats', adminAuth, (_req, res) => {
+    router.get('/geo/stats', adminAuth, async (_req, res) => {
       try {
-        const stats = geoLimiter.getCountryStats();
+        // Reads per-country counts from the shared store (Issue #882) — may
+        // be Redis-backed, so the stats read is asynchronous.
+        const stats = await geoLimiter.getCountryStats();
         res.json({ data: stats });
       } catch (error) {
         res.status(500).json({ error: 'Failed to get geo stats' });

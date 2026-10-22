@@ -85,7 +85,9 @@ class FederatedErrorHandler {
       error: {
         message: error.message,
         name: error.name,
-        stack: process.env.NODE_ENV === 'development' ? error.stack undefined
+        // (pre-existing typo: missing `:` in this ternary made the file
+        // unparseable — fixed so `node --check` and test workers can load it.)
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       },
       context,
       timestamp: new Date().toISOString()

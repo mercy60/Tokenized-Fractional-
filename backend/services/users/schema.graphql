@@ -77,6 +77,36 @@ type UserStatistics {
   activeUsers: Int!
 }
 
+# ─── Reference stubs for entities owned by other subgraphs ───────────────
+# User.ownedAssets / User.transactions point at entities owned by the assets
+# and transactions services. Per Federation v2 the fields listed in
+# @provides are declared @external here so this subgraph can serve them
+# inline via @provides without claiming ownership. Keys match the owning
+# subgraphs (Asset @key contractId, Transaction @key transactionId).
+
+type Asset @key(fields: "contractId") {
+  contractId: ID!
+  title: String! @external
+}
+
+type Transaction @key(fields: "transactionId") {
+  transactionId: ID!
+  type: TransactionType! @external
+  amount: Int! @external
+}
+
+# Foreign enum mirrored from the transactions service so the provided
+# field type is identical to the owning subgraph.
+enum TransactionType {
+  PURCHASE
+  TRANSFER
+  MINT
+  BURN
+  APPROVAL
+  DEPOSIT
+  WITHDRAWAL
+}
+
 type Mutation {
   updateUserProfile(userId: ID!, input: UserProfileInput!): User!
   updateUserPreferences(userId: ID!, input: UserPreferencesInput!): User!

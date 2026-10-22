@@ -11,8 +11,17 @@
 
 import validator from 'validator';
 import { performance } from 'perf_hooks';
-import { JSDOM } from 'jsdom';
+import { createRequire } from 'module';
 import createDOMPurify from 'dompurify';
+
+// jsdom is loaded lazily (see getDOMPurify) rather than at module load: the
+// module graph jsdom pulls in is heavy, and deferring it keeps importing
+// this service cheap for callers that only use sanitizeString /
+// detectInjection / sanitizePayload. `createRequire` gives us a synchronous
+// loader that works from ESM; production behaviour is unchanged — the same
+// JSDOM instance is created on first sanitizeHtml() call as was previously
+// created at import time.
+const requireFromHere = createRequire(import.meta.url);
 
 // Sanitization Rule Configuration
 const SANITIZATION_RULES = {
@@ -33,6 +42,7 @@ let dompurifyInstance = null;
 function getDOMPurify() {
   if (dompurifyInstance) return dompurifyInstance;
 
+  const { JSDOM } = requireFromHere('jsdom');
   const { window } = new JSDOM('<!DOCTYPE html><html><body></body></html>');
   const purify = createDOMPurify(window);
 

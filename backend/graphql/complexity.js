@@ -3,6 +3,22 @@
 // Analyzes incoming GraphQL queries to compute a complexity score,
 // enforce depth limits, and reject abusive queries before execution.
 //
+// ─────────────────────────────────────────────────────────────────────────────
+// AUTHORITATIVE ENFORCEMENT MODULE (clarified for Issue #884):
+//
+// This is the ONLY complexity module wired into a served GraphQL endpoint.
+// Its `complexityValidationRule` is registered at every entrypoint:
+//   - /api/graphql        → graphql/index.js             (per-tier limits)
+//   - /graphql (gateway)  → src/federation/gateway.js     (standard tier)
+//   - standalone subgraph services → services/shared/subgraphServer.js
+//                             (defense in depth if a subgraph port is exposed)
+//
+// Note: `graphql/analysis/queryAnalyzer.js` (top-level graphql/ directory) is
+// a separate, advisory analysis/reporting utility for the persisted-query
+// tooling. Nothing in the request path imports it — it is superseded by this
+// module for enforcement purposes.
+// ─────────────────────────────────────────────────────────────────────────────
+//
 // This module exports:
 //   1. calculateComplexity(ast) - compute score/depth/fieldCount from a parsed AST
 //   2. complexityValidationRule - a graphql-js validation rule that rejects

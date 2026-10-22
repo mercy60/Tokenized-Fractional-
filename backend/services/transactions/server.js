@@ -1,20 +1,16 @@
 // Transactions Service - Federated GraphQL Server
 // This is a standalone federated service for transaction management
 
-import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { resolvers, typeDefs } from './resolvers.js';
+import { createSubgraphServiceServer } from '../shared/subgraphServer.js';
 
 const PORT = process.env.TRANSACTIONS_SERVICE_PORT || 4003;
 
-// Create Apollo Server with Federation support
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  // Federation configuration
-  // Note: In production, you would use @apollo/federation package
-  // For now, we're using standard Apollo Server with federated schema
-});
+// Create Apollo Server with Federation support.
+// Query complexity limits are enforced here as well as at the gateway so a
+// directly exposed subgraph port is still protected (Issue #884).
+const server = createSubgraphServiceServer({ typeDefs, resolvers });
 
 // Start the server
 const { url } = await startStandaloneServer(server, {
