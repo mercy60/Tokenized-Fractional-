@@ -105,6 +105,34 @@ type TransactionStatusCount {
   count: Int!
 }
 
+# ─── Reference stubs for entities owned by other subgraphs ───────────────
+# Transaction.asset / Transaction.user point at entities owned by the assets
+# and users services. Per Federation v2 the fields listed in @provides are
+# declared @external here so this subgraph can serve them inline via
+# @provides without claiming ownership. Keys match the owning subgraphs
+# (Asset @key contractId, User @key userId).
+
+type Asset @key(fields: "contractId") {
+  contractId: ID!
+  title: String! @external
+  location: String! @external
+}
+
+type User @key(fields: "userId") {
+  userId: ID!
+  walletAddress: String! @external
+  kycStatus: KYCStatus! @external
+}
+
+# Foreign enum mirrored from the users service so the provided field type
+# is identical to the owning subgraph.
+enum KYCStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NOT_STARTED
+}
+
 type Mutation {
   createTransaction(input: TransactionInput!): Transaction!
   updateTransactionStatus(transactionId: ID!, status: TransactionStatus!, transactionHash: String): Transaction!

@@ -367,5 +367,8 @@ export function createAssetsSubgraph(dataLayer) {
     },
   };
 
-  return buildSubgraphSchema({ typeDefs, resolvers });
+  // buildSubgraphSchema expects an array of { typeDefs, resolvers } modules;
+  // a bare module object makes concatAST throw "doc.definitions is not
+  // iterable" during schema construction.
+  return buildSubgraphSchema([{ typeDefs, resolvers }]);
 }

@@ -190,7 +190,9 @@ export function assetMetadataValidationMiddleware(req, res, next) {
  * GraphQL resolver wrapper for metadata validation
  */
 export function withMetadataValidation(resolverFn) {
-  return async (parent, args, context, info) {
+  // NOTE: this arrow function was missing its `=>` (pre-existing syntax
+  // error that failed `node --check` and crashed test workers on load).
+  return async (parent, args, context, info) => {
     const metadata = args.metadata || args.input?.metadata;
 
     if (metadata) {

@@ -1,6 +1,26 @@
 /**
  * Query Analysis and Optimization Engine
  * Analyzes queries for complexity, depth, and optimization opportunities
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * RELATIONSHIP TO THE ENFORCEMENT MODULE (clarified for Issue #884):
+ *
+ * This module is NOT wired into any served GraphQL endpoint — nothing in the
+ * runtime request path imports it. It belongs to the standalone `graphql/`
+ * analysis/observability layer (persisted-query registration, versioning and
+ * analytics tooling described in GRAPHQL_IMPLEMENTATION*.md) and its
+ * thresholds are advisory, used for scoring and reporting.
+ *
+ * Query *enforcement* — rejecting abusive operations before execution — is
+ * owned exclusively by `backend/graphql/complexity.js`
+ * (`complexityValidationRule`), which is applied at every GraphQL entrypoint:
+ *   - /api/graphql        → backend/graphql/index.js   (per-tier limits)
+ *   - /graphql (gateway)  → backend/src/federation/gateway.js (standard tier)
+ *   - standalone subgraph services → backend/services/shared/subgraphServer.js
+ *
+ * If you need to change what gets rejected, change backend/graphql/complexity.js;
+ * this module only reports.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import { parse, visit } from 'graphql';

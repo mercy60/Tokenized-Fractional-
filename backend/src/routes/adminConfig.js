@@ -261,7 +261,10 @@ export function createAdminConfigRoutes() {
   });
 
   // POST /admin/config/export - Export configuration
-  router.post('/config/export', adminAuth, (req, res) => {
+  // async: the export path optionally awaits auditLogService.getLogs()
+  // (node --check previously failed on this file — await inside a sync
+  // handler).
+  router.post('/config/export', adminAuth, async (req, res) => {
     const { includeAudit = false } = req.body || {};
 
     const exportData = {

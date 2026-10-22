@@ -39,10 +39,15 @@ export const typeDefs = parse(`#graphql
   }
 
   """
-  Reference to RWA entity defined in Assets subgraph
+  Reference to RWA entity defined in Assets subgraph.
+
+  Per Federation v2 the stub keeps its @key field *resolvable* here (no
+  @external) — the key field is shared implicitly between subgraphs that
+  declare the same entity, and marking it @external would make the entity
+  unreferenceable from this subgraph.
   """
-  type RWA @key(fields: "contractId", extendable: true) {
-    contractId: String! @external
+  type RWA @key(fields: "contractId") {
+    contractId: String!
   }
 
   type Query {
@@ -145,5 +150,8 @@ export function createUsersSubgraph(transactionService) {
     },
   };
 
-  return buildSubgraphSchema({ typeDefs, resolvers });
+  // buildSubgraphSchema expects an array of { typeDefs, resolvers } modules;
+  // a bare module object makes concatAST throw "doc.definitions is not
+  // iterable" during schema construction.
+  return buildSubgraphSchema([{ typeDefs, resolvers }]);
 }
